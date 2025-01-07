@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include <time.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -39,6 +40,19 @@ int option;
 
 bool hasFork;
 char food;
+
+void countdown_timer(int seconds) {
+    while (seconds > 0) {
+        int minutesRemaining = (seconds % 3600) / 60;
+        int secondsRemaining = seconds % 60;
+        printf("\rTime remaining: %02d:%02d", minutesRemaining, secondsRemaining);
+        fflush(stdout);
+        sleep(1); 
+        seconds--;
+    }
+    printf("\nTime's up! You've been caught!\n");
+    exit(0); 
+}
 
 int main() {
 	srand( time( NULL ) );
@@ -110,7 +124,17 @@ int main() {
 				hasFork = true;
 				break;
 			case 4:
-				printf( "" );
+				printf( "You walk on your tippy toes over to the side door but find a padlock with a four digit numeric keypad and four plates. You try out a combination when suddenly, you have just activitated a timed system! If you don't get the code within two minutes. You will be caught!\n"
+"    x  x          x  x          x  x          x  x    \n"
+" x        x    x        x    x        x    x        x \n"
+"x          x  x          x  x          x  x          x\n"
+"x          x  x          x  x          x  x          x\n"
+" x        x    x        x    x        x    x        x \n"
+"    x  x          x  x          x  x          x  x    \n" );
+
+				countdown_timer(120);
+
+				printf("Hi");
 				break;
 		}
 	}
