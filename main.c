@@ -71,14 +71,14 @@ void countdown_timer( int seconds ) {
 
 		printf( "\e7\e[FTime remaining: %02d:%02d\e8", minutes_remaining, seconds_remaining );
 		fflush( stdout );
-		sleep( 1 ); 
+		sleep( 1 );
 		seconds--;
 	}
 
 	pthread_cancel( thread_pid );
 
 	printf( "\nTime's up! You've been caught!\n" );
-	exit( 0 ); 
+	exit( 0 );
 }
 
 int main() {
