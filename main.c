@@ -20,12 +20,19 @@
 
 #include <math.h>
 #include <time.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <pthread.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#define SLEEP( x ) Sleep( x );
+#else
+#include <unistd.h>
+#define SLEEP( x ) sleep( x );
+#endif
 
 char* options[] = {
 	"Eat",
