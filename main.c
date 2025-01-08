@@ -2,7 +2,7 @@
  * Pranav and Stratton
  * Escape Room
  * 1/6/25
- * Extra: ASCII Art
+ * Extra:
  */
 
 /*
@@ -21,6 +21,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -53,6 +54,15 @@ void* threaded_input( void* output ) {
 	fgets( ( char* )output, 5, stdin );
 }
 
+int isPerfectSquare(long double x)
+{
+    if (x >= 0) {
+        long long sr = sqrt(x);
+        return (sr * sr == x);
+    }
+    return 0;
+}
+
 void countdown_timer( int seconds ) {
 	printf( "\n" );
 
@@ -78,14 +88,14 @@ void countdown_timer( int seconds ) {
 
 		printf( "\e7\e[FTime remaining: %02d:%02d\e8", minutes_remaining, seconds_remaining );
 		fflush( stdout );
-		sleep( 1 );
+		SLEEP( 1 ); 
 		seconds--;
 	}
 
 	pthread_cancel( thread_pid );
 
 	printf( "\nTime's up! You've been caught!\n" );
-	exit( 0 );
+	exit( 0 ); 
 }
 
 int main() {
@@ -124,18 +134,44 @@ int main() {
 
 				if ( hasFork ) {
 					printf( "\nA strange kid walks up to you and says, \"Gimme that food and gimme dat fork and ill get u outa here\"\nGive the strange kid the food and fork [Y/n]? " );
-                    
-                    if(!isalpha(ch)) {
-                        printf( "You're wasting my time >:(\n" );
-                        exit(0);
-                    }
 
 					char ch = getc( stdin );
 					if ( ch != '\n' ) { while ( getc( stdin ) != '\n' ); }
 
 					if ( ch == 'y' || ch == 'Y' || ch == '\n' ) {
-						printf("You hand the strange kid the food and fork, he swollows the plate whole and in one swift motion gives the fork to the guard. You walk out without resistance.\n");
-						exit(0);
+						char input[10];
+						int riddleGuess;
+
+						printf("I'll help you, but only if you solve this riddle.\n\e[1mI am a number who's perfect. I am equal in length and width like a square. What number am I?\n");
+						int isValid;
+						do {
+							printf("Guess: ");
+							scanf("%s", input);
+
+							isValid = 1;
+
+							for (int i = 0; i < strlen(input); i++) {
+								if (!isdigit(input[i])) {
+									isValid = 0;
+									break;
+								}
+							}
+
+							if (!isValid) {
+								printf("\e[31mInvalid input. Try again.\e[0m\n");
+							} else {
+								riddleGuess = atoi(input);
+							}
+						} while (!isValid);
+						
+						if (isPerfectSquare(riddleGuess) == 1) {
+							printf("You hand the strange kid the food and fork, he swollows the plate whole and in one swift motion gives the fork to the guard. You walk out without resistance.\n");
+							exit(0);
+						}
+						else {
+							printf("You're wasing my time.");
+						}
+					
 					} else {
 						printf("The kid scowls at you and walks away.\n");
 					}
@@ -172,11 +208,8 @@ int main() {
 "    x  x          x  x          x  x          x  x    \n" );
 
 				countdown_timer(120);
-
-				printf("Hi");
 				break;
 		}
 	}
-
     return 0;
 }
