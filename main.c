@@ -25,6 +25,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 char* options[] = {
 	"Eat",
@@ -33,7 +34,7 @@ char* options[] = {
 	"Try to sneak out"
 };
 
-int code[] = { 1, 2, 3, 4 };
+int code[] = { 0, 1, 2, 3 };
 
 int length = 4;
 int option;
@@ -41,17 +42,43 @@ int option;
 bool hasFork;
 char food;
 
-void countdown_timer(int seconds) {
-    while (seconds > 0) {
-        int minutesRemaining = (seconds % 3600) / 60;
-        int secondsRemaining = seconds % 60;
-        printf("\rTime remaining: %02d:%02d", minutesRemaining, secondsRemaining);
-        fflush(stdout);
-        sleep(1); 
-        seconds--;
-    }
-    printf("\nTime's up! You've been caught!\n");
-    exit(0); 
+void* threaded_input( void* output ) {
+	fgets( ( char* )output, 5, stdin );
+}
+
+void countdown_timer( int seconds ) {
+	printf( "\n" );
+
+	char input_code[5] = "";
+	pthread_t thread_pid;
+
+	pthread_create( &thread_pid, NULL, &threaded_input, input_code );
+
+	while (seconds > 0) {
+		if ( input_code[0] != '\0' ) {
+			for ( int i = 0; i < 4; i++ ) {
+				if ( input_code[i] - '1' != code[i] ) {
+					printf( "\nYou typed it wrong! The alarm rings and you get caught!\n" );
+					exit( 0 );
+				}
+			}
+			printf( "\nCORRECT! You run to class and grab your bag! but then a teacher sees u in the hall and u get sent 2 juve lol\n" );
+			exit( 0 );
+		}
+
+		int minutes_remaining = (seconds % 3600) / 60;
+		int seconds_remaining = seconds % 60;
+
+		printf( "\e7\e[FTime remaining: %02d:%02d\e8", minutes_remaining, seconds_remaining );
+		fflush( stdout );
+		sleep( 1 ); 
+		seconds--;
+	}
+
+	pthread_cancel( thread_pid );
+
+	printf( "\nTime's up! You've been caught!\n" );
+	exit( 0 ); 
 }
 
 int main() {
@@ -124,11 +151,11 @@ int main() {
 				hasFork = true;
 				break;
 			case 4:
-				printf( "You walk on your tippy toes over to the side door but find a padlock with a four digit numeric keypad and four plates. You try out a combination when suddenly, you have just activitated a timed system! If you don't get the code within two minutes. You will be caught!\n"
+				printf( "You walk on your tippy toes over to the side door but find a padlock with a four digit numeric keypad and four plates. You try out a combination when suddenly, you have just activitated a timed alarm system! If you don't get the code within two minutes, or type it wrong. You will be caught!\n"
 "    x  x          x  x          x  x          x  x    \n"
 " x        x    x        x    x        x    x        x \n"
-"x          x  x          x  x          x  x          x\n"
-"x          x  x          x  x          x  x          x\n"
+"x    A     x  x     B    x  x          x  x          x\n"
+"x          x  x          x  x     C    x  x    D     x\n"
 " x        x    x        x    x        x    x        x \n"
 "    x  x          x  x          x  x          x  x    \n" );
 
@@ -141,3 +168,4 @@ int main() {
 
     return 0;
 }
+
