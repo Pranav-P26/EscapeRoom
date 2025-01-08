@@ -2,7 +2,7 @@
  * Pranav and Stratton
  * Escape Room
  * 1/6/25
- * Extra:
+ * Extra: ASCII Art
  */
 
 /*
@@ -124,6 +124,11 @@ int main() {
 
 				if ( hasFork ) {
 					printf( "\nA strange kid walks up to you and says, \"Gimme that food and gimme dat fork and ill get u outa here\"\nGive the strange kid the food and fork [Y/n]? " );
+                    
+                    if(!isalpha(ch)) {
+                        printf( "You're wasting my time >:(\n" );
+                        exit(0);
+                    }
 
 					char ch = getc( stdin );
 					if ( ch != '\n' ) { while ( getc( stdin ) != '\n' ); }
@@ -175,4 +180,3 @@ int main() {
 
     return 0;
 }
-
