@@ -25,14 +25,24 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <pthread.h>
 
 #ifdef _WIN32
 #include <windows.h>
 #define SLEEP( x ) Sleep( x );
+
+DWORD WINAPI win_threaded_input( void* output ) {
+    fgets( ( char* )output, 5, stdin );
+}
+
 #else
+#include <pthread.h>
 #include <unistd.h>
 #define SLEEP( x ) sleep( x );
+
+void* threaded_input( void* output ) {
+	fgets( ( char* )output, 5, stdin );
+}
+
 #endif
 
 char* options[] = {
@@ -50,15 +60,12 @@ int option;
 bool hasFork;
 char food;
 
-void* threaded_input( void* output ) {
-	fgets( ( char* )output, 5, stdin );
-}
 
-int isPerfectSquare(long double x)
-{
-    if (x >= 0) {
-        long long sr = sqrt(x);
-        return (sr * sr == x);
+
+int isPerfectSquare( long double x ) {
+    if ( x >= 0 ) {
+        long long sr = sqrt( x );
+        return sr * sr == x;
     }
     return 0;
 }
@@ -67,9 +74,13 @@ void countdown_timer( int seconds ) {
 	printf( "\n" );
 
 	char input_code[5] = "";
-	pthread_t thread_pid;
 
+    #ifdef _WIN32
+    HANDLE thread_pid = CreateThread( NULL, 0, win_threaded_input, NULL, 0, NULL );
+    #else
+	pthread_t thread_pid;
 	pthread_create( &thread_pid, NULL, &threaded_input, input_code );
+    #endif
 
 	while (seconds > 0) {
 		if ( input_code[0] != '\0' ) {
@@ -92,7 +103,11 @@ void countdown_timer( int seconds ) {
 		seconds--;
 	}
 
+	#ifdef _WIN32
 	pthread_cancel( thread_pid );
+	#else
+	TerminateThread( thread_pid, 0 );
+    #endif
 
 	printf( "\nTime's up! You've been caught!\n" );
 	exit( 0 ); 
